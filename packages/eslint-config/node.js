@@ -1,5 +1,7 @@
+import eslintConfigPrettier from "eslint-config-prettier";
 import globals from "globals";
-import { config as baseConfig } from "./base.js";
+
+import { sharedConfig } from "./base.js";
 
 /**
  * ESLint config for Node.js packages (api, services, database, trpc).
@@ -7,7 +9,7 @@ import { config as baseConfig } from "./base.js";
  * @type {import("eslint").Linter.Config[]}
  */
 export const nodeConfig = [
-  ...baseConfig,
+  ...sharedConfig,
   {
     languageOptions: {
       globals: {
@@ -15,4 +17,5 @@ export const nodeConfig = [
       },
     },
   },
+  eslintConfigPrettier,
 ];

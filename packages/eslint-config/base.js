@@ -2,31 +2,34 @@ import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
-import onlyWarn from "eslint-plugin-only-warn";
 
 /**
- * A shared ESLint configuration for the repository.
+ * Rules shared by every package. Exported without Prettier so that each final
+ * config can append Prettier last: it only turns rules off, so anything listed
+ * after it could turn a formatting rule back on.
  *
  * @type {import("eslint").Linter.Config[]}
- * */
-export const config = [
+ */
+export const sharedConfig = [
   js.configs.recommended,
-  eslintConfigPrettier,
   ...tseslint.configs.recommended,
   {
     plugins: {
       turbo: turboPlugin,
     },
     rules: {
-      "turbo/no-undeclared-env-vars": "warn",
+      // process.env.X must be declared in turbo.json, or Turbo strips it from tasks.
+      "turbo/no-undeclared-env-vars": "error",
     },
   },
   {
-    plugins: {
-      onlyWarn,
-    },
-  },
-  {
-    ignores: ["dist/**"],
+    ignores: ["dist/**", ".turbo/**", "coverage/**"],
   },
 ];
+
+/**
+ * Config for packages with no runtime-specific globals.
+ *
+ * @type {import("eslint").Linter.Config[]}
+ */
+export const config = [...sharedConfig, eslintConfigPrettier];

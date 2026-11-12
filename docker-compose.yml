@@ -1,6 +1,7 @@
 services:
   postgresdb:
-    image: postgres:16
+    # Postgres 17 with the pgvector extension (decision 10.4: embeddings live in Postgres).
+    image: pgvector/pgvector:pg17
     restart: unless-stopped
     container_name: postgresdb
 
@@ -14,6 +15,13 @@ services:
 
     volumes:
       - pg_data:/var/lib/postgresql/data
+
+    # Lets other services wait with `depends_on: { postgresdb: { condition: service_healthy } }`.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
   pg_data:

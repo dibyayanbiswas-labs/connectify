@@ -2,28 +2,22 @@
   "name": "connectify",
   "private": true,
   "type": "module",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
     "setup:dev": "bash scripts/setup.sh",
-    "build": "dotenv -v NODE_ENV=production turbo build",
+    "build": "dotenv -v NODE_ENV=production -- turbo build",
     "dev": "dotenv -- turbo dev",
     "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "db:up": "docker compose up -d postgresdb",
+    "db:down": "docker compose down",
+    "db:restart": "docker compose restart postgresdb",
     "db:generate": "dotenv -- turbo db:generate",
     "db:migrate": "dotenv -- turbo db:migrate",
     "db:check": "dotenv -- turbo db:check --filter=@repo/database",
-    "db:seed": "dotenv -- turbo db:seed --filter=@repo/database",
-    "db-up": "docker compose up -d postgresdb",
-    "db-down": "docker compose down",
-    "db-restart": "docker compose down && docker compose up -d postgresdb",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types",
-    "test": "turbo run test"
+    "db:seed": "dotenv -- turbo db:seed --filter=@repo/database"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
@@ -33,12 +27,12 @@
   },
   "packageManager": "pnpm@12.18.0+sha512.9d7882d5dc82147ecfc4e062aa34834e0ad0296710a1837a1115ae012127d36b7109e321ac1598a1dd0a65597681b1e99917e12ed0d749eae91187943363beb3",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "devDependencies": {
+    "dotenv-cli": "^11.1.0",
     "prettier": "^3.10.0",
     "turbo": "^2.11.10",
-    "typescript": "^7.0.2",
-    "dotenv-cli": "^11.1.0"
+    "typescript": "~6.0.3"
   }
 }
