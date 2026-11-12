@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# pnpm settings (pnpm 12 reads these here, not from .npmrc)
+# Fail install on a Node version outside package.json "engines"
+engineStrict: true
