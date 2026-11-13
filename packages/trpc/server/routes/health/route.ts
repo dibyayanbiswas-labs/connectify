@@ -1,8 +1,13 @@
 import { pingDatabase } from "@repo/database";
+import { logger } from "@repo/logger";
 import { TRPCError } from "@trpc/server";
 
 import { publicProcedure, router } from "../../trpc";
 import { healthInput, liveOutput, readyOutput } from "./schema";
+
+// Probes call `ready` every few seconds, so log only when the state flips, not on every call.
+// Per API instance, and only used for logging.
+let databaseUp = true;
 
 export const healthRouter = router({
   /**
@@ -46,13 +51,17 @@ export const healthRouter = router({
       try {
         await pingDatabase();
       } catch (error) {
-        // The logging middleware logs this (with the cause) at warn level.
+        if (databaseUp) logger.warn("Database became unreachable", { err: error });
+        databaseUp = false;
         throw new TRPCError({
           code: "SERVICE_UNAVAILABLE",
           message: "Database unreachable",
           cause: error,
         });
       }
+
+      if (!databaseUp) logger.info("Database reachable again");
+      databaseUp = true;
       return { status: "ok" as const, checks: { database: "up" as const } };
     }),
 });

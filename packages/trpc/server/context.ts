@@ -1,5 +1,3 @@
-import crypto from "node:crypto";
-
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 
 /**
@@ -7,10 +5,14 @@ import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
  * else: req/res stay here until a procedure needs them (cookies, Phase 2).
  */
 export function createContext({ res }: CreateExpressContextOptions) {
-  // Generated on the server, never read from the client: a client-sent id can be any string.
-  const requestId = crypto.randomUUID().slice(0, 12);
+  const requestId = res.locals.requestId as string; // res.locals = Express's per-request storage, so the tRPC context can read it.
+  // fail fast if the requestId is missing, because it should always be set by the request-id middleware.
+  if (!requestId || typeof requestId !== "string") {
+    throw new Error(
+      "Request ID is missing from the context. Request ID middleware must be installed before the tRPC middleware.",
+    );
+  }
 
-  res.setHeader("x-request-id", requestId);
   return { requestId };
 }
 
