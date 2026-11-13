@@ -5,7 +5,6 @@
 | **Status**       | Draft v3: decisions closed, ready for Phase 1 |
 | **Author**       | <you>                                         |
 | **Last updated** | 2026-11-12                                    |
-| **Reviewers**    | Mentor (Claude)                               |
 
 > Working name. "Connectify" collides with an existing product (Connectify Hotspot). Kept on purpose for now; rename before any public launch.
 
