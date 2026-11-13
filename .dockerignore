@@ -1,0 +1,26 @@
+# Docker sends this folder to the builder as the build context.
+# Anything listed here never reaches the builder, so it can't land in an image layer.
+# Patterns match from the repo root; use **/ to match in every package.
+
+# Dependencies: the image runs its own pnpm install
+node_modules
+**/node_modules
+
+# Build output: rebuilt inside the image
+**/dist
+**/.next
+
+# Git history
+.git
+
+# Env files: secrets must never end up in an image layer. Keep the template.
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+
+# Local caches and reports
+**/.turbo
+**/coverage
+**/*.log
