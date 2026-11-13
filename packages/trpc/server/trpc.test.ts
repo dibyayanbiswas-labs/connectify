@@ -1,8 +1,7 @@
-import { TRPCError } from "@trpc/server";
-import { publicProcedure, router } from "./trpc";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-
 import { describe, expect, it } from "vitest";
+
+import { publicProcedure, router } from "./trpc";
 
 const trpcTestRouter = router({
   boom: publicProcedure.query(() => {
