@@ -1,5 +1,6 @@
 import { logger } from "@repo/logger";
 import { initTRPC } from "@trpc/server";
+import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import type { OpenApiMeta } from "trpc-to-openapi";
 
 import type { Context } from "./context";
@@ -44,11 +45,15 @@ const loggingMiddleware = t.middleware(async ({ path, type, ctx, next }) => {
         : path.startsWith("health.")
           ? "debug" // probes repeat every few seconds; the health route logs state changes
           : "warn";
-    // The original error (with its stack) is the cause; the TRPCError only wraps it.
+    // Server errors (5xx): log the original error with its stack (the cause; the TRPCError
+    // only wraps it). Client errors (4xx): log the code only. Their messages can quote the
+    // request input (a JSON parse error does), which may hold email text or tokens, and
+    // their stacks point at our validation code, not at a bug.
+    const isServerError = getHTTPStatusCodeFromError(result.error) >= 500;
     logger.log(level, "tRPC call failed", {
       ...meta,
       code: result.error.code,
-      err: result.error.cause ?? result.error,
+      ...(isServerError && { err: result.error.cause ?? result.error }),
     });
   }
   return result;
