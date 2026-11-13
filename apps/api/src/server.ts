@@ -9,12 +9,16 @@ import {
 import express, { type ErrorRequestHandler } from "express";
 import helmet from "helmet";
 
+import { accessLogMiddleware } from "./middleware/access-log";
 import { requestIdMiddleware } from "./middleware/request-id";
 
 export const app = express();
 
 // first, so every later request (including error handler) has an id
 app.use(requestIdMiddleware);
+
+// second, so every request is logged once with its id, whatever handles it
+app.use(accessLogMiddleware);
 
 // security headers on every response
 app.use(helmet());
