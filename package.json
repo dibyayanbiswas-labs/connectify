@@ -12,11 +12,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "db:up": "docker compose up -d postgresdb",
     "db:down": "docker compose down",
-    "db:restart": "docker compose restart postgresdb",
     "db:generate": "dotenv -- turbo db:generate",
     "db:migrate": "dotenv -- turbo db:migrate",
-    "db:check": "dotenv -- turbo db:check --filter=@repo/database",
-    "db:seed": "dotenv -- turbo db:seed --filter=@repo/database"
+    "db:check": "dotenv -- turbo db:check --filter=@repo/database"
   },
   "devEngines": {
     "packageManager": {
@@ -30,7 +28,6 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "@types/node": "^26.6.6",
     "dotenv-cli": "^11.1.0",
     "prettier": "^3.10.0",
     "turbo": "^2.11.10",

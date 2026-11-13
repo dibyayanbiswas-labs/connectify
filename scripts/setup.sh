@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Local setup for a fresh clone: checks prerequisites and links .env. Safe to re-run.
+# Local setup for a fresh clone: checks prerequisites and creates .env. Safe to re-run.
 # Usage: pnpm setup:dev   (or: bash scripts/setup.sh)
 # Development only. Production gets env vars from the platform's secret store.
 set -euo pipefail
@@ -22,15 +22,7 @@ else
   cp .env.example .env
   echo "Created .env from .env.example. Fill in the real values before running the app."
 fi
-
-# Tools such as Next.js and drizzle-kit read .env from their own package folder,
-# so each workspace package gets a symlink to the single root .env.
-for pkg in apps/*/ packages/*/; do
-  [ -f "${pkg}package.json" ] || continue
-  if [ ! -e "${pkg}.env" ]; then
-    ln -s "../../.env" "${pkg}.env"
-    echo "Linked ${pkg}.env -> .env"
-  fi
-done
+# One way to load env: root scripts run `dotenv -- turbo ...`, and turbo passes the
+# variables listed in turbo.json to each task. Packages never read .env themselves.
 
 echo "==> Done"

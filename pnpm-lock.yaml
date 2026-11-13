@@ -166,9 +166,6 @@ importers:
 
   .:
     devDependencies:
-      '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
       dotenv-cli:
         specifier: ^11.1.0
         version: 11.1.0
@@ -184,6 +181,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@repo/logger':
+        specifier: workspace:*
+        version: link:../logger
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(@types/pg@8.23.1)(pg@8.23.1)
@@ -201,14 +201,11 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
       '@types/node':
-        specifier: ^26.6.6
-        version: 26.6.6
+        specifier: ^22.20.5
+        version: 22.20.5
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
-      dotenv-cli:
-        specifier: ^11.1.0
-        version: 11.1.0
       drizzle-kit:
         specifier: ^0.31.11
         version: 0.31.11
