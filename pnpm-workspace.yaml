@@ -6,4 +6,6 @@ packages:
 # Fail install on a Node version outside package.json "engines"
 allowBuilds:
   esbuild: false
+  sharp: false
+  unrs-resolver: false
 engineStrict: true

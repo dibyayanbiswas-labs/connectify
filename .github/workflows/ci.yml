@@ -42,4 +42,4 @@ jobs:
       - name: Build API image
         run: docker build -f apps/api/Dockerfile .
       - name: Build web image
-        run: docker build -f apps/web/Dockerfile --build-arg API_URL=http://api:4000 .
+        run: docker build -f apps/web/Dockerfile .

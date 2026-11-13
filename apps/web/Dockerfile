@@ -1,5 +1,6 @@
 # Build from the repo root, because the build needs the workspace packages:
-#   docker build -f apps/web/Dockerfile --build-arg API_URL=http://api:4000 -t connectify-web .
+#   docker build -f apps/web/Dockerfile -t connectify-web .
+# Then run it with API_URL set (read at runtime by proxy.ts), so one image fits every environment.
 
 # ---- build: install the workspace and build Next.js in standalone mode ----
 FROM node:22-slim AS build
@@ -14,9 +15,7 @@ RUN pnpm fetch
 COPY . .
 RUN pnpm install --offline --frozen-lockfile
 
-# Rewrites are written into the build output, so the API address is fixed at build time.
-ARG API_URL
-ENV API_URL=$API_URL NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @repo/web build
 
 # ---- runtime: server.js and the node_modules it traced, nothing else ----

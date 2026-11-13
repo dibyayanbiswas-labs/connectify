@@ -5,7 +5,7 @@ import { env } from "./env";
 
 export function createPgPool(connectionString = env.DATABASE_URL) {
   // SSL comes from the URL itself (Neon URLs carry ?sslmode=require), with the
-  // certificate verified. Thread forced rejectUnauthorized: false, which skips that check.
+  // certificate verified.
   const pool = new pg.Pool({
     connectionString,
     max: 10,

@@ -18,12 +18,19 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  // Browser calls same-origin /api/trpc/*; Next forwards it to the API server.
-  async rewrites() {
+  // The /api/trpc forward lives in proxy.ts, so API_URL is read at runtime, not baked in here.
+  poweredByHeader: false,
+  // Baseline security headers on every page. A Content-Security-Policy needs per-request
+  // nonces in Next.js; add it with the first third-party script or user-generated HTML.
+  async headers() {
     return [
       {
-        source: "/api/trpc/:path*",
-        destination: `${process.env.API_URL}/trpc/:path*`,
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
       },
     ];
   },

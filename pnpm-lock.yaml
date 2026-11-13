@@ -187,6 +187,9 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/env':
+        specifier: workspace:*
+        version: link:../../packages/env
       '@repo/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -236,6 +239,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@repo/env':
+        specifier: workspace:*
+        version: link:../../packages/env
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -254,6 +260,9 @@ importers:
       react-dom:
         specifier: 19.3.0
         version: 19.3.0(react@19.3.0)
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -282,6 +291,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@repo/env':
+        specifier: workspace:*
+        version: link:../env
       '@repo/logger':
         specifier: workspace:*
         version: link:../logger
@@ -313,6 +325,25 @@ importers:
       drizzle-kit:
         specifier: ^0.31.11
         version: 0.31.11
+      eslint:
+        specifier: ^10.14.0
+        version: 10.14.0(jiti@2.7.0)(supports-color@7.2.0)
+
+  packages/env:
+    dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^22.20.5
+        version: 22.20.5
       eslint:
         specifier: ^10.14.0
         version: 10.14.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -349,6 +380,9 @@ importers:
 
   packages/logger:
     dependencies:
+      '@repo/env':
+        specifier: workspace:*
+        version: link:../env
       winston:
         specifier: ^3.19.0
         version: 3.19.0
