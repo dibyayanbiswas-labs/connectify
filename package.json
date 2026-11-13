@@ -8,7 +8,7 @@
     "dev": "dotenv -- turbo dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
-    "test": "turbo run test",
+    "test": "dotenv -- turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "db:up": "docker compose up -d postgresdb",
     "db:down": "docker compose down",
@@ -28,6 +28,7 @@
     "node": ">=22"
   },
   "devDependencies": {
+    "@types/node": "^22.20.5",
     "dotenv-cli": "^11.1.0",
     "prettier": "^3.10.0",
     "turbo": "^2.11.10",
