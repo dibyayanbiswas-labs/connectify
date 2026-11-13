@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Treat unset, empty and whitespace-only values the same, so `KEY=` falls back to the default. */
+/** Treat unset, empty and whitespace-only values the same, so `KEY=` counts as unset. */
 function emptyToUndefined(value: unknown) {
   if (typeof value !== "string") return value;
   const trimmed = value.trim();
@@ -8,53 +8,48 @@ function emptyToUndefined(value: unknown) {
 }
 
 /** Neon marks pooled (PgBouncer) hosts with "-pooler", e.g. ep-xxx-pooler.us-east-2.aws.neon.tech */
-function isPoolerHost(url: string) {
+export function isPoolerHost(url: string) {
   return new URL(url).hostname.includes("-pooler");
 }
 
 const postgresUrl = z.url({
   protocol: /^postgres(ql)?$/,
-  error: "Must be a postgres:// or postgresql:// connection string",
+  // A missing variable and a malformed one need different fixes, so say which it is.
+  error: (issue) =>
+    issue.input === undefined
+      ? "Missing. Copy .env.example to .env (pnpm setup:dev)"
+      : "Must be a postgres:// or postgresql:// connection string",
 });
-
-const optionalInt = (fallback: number, min = 0, max = Number.MAX_SAFE_INTEGER) =>
-  z.preprocess(emptyToUndefined, z.coerce.number().int().min(min).max(max).default(fallback));
 
 const envSchema = z.object({
-  DATABASE_URL: z
-    .preprocess(emptyToUndefined, postgresUrl)
-    .describe("Postgres URL — Neon pooled connection for the app"),
-
-  DATABASE_URL_UNPOOLED: z
-    .preprocess(
-      emptyToUndefined,
-      postgresUrl
-        .refine((url) => !isPoolerHost(url), "Points at a pooled host (contains \"-pooler\"); use Neon's direct URL")
-        .optional(),
-    )
-    .describe("Neon direct (non-pooler) URL — use for drizzle-kit migrate"),
-
-  DB_POOL_MAX: optionalInt(10, 1, 100).describe("Max connections in the node-postgres pool"),
-
-  DB_IDLE_TIMEOUT_MS: optionalInt(30_000).describe("Close a pooled connection after it is idle this long"),
-
-  DB_CONNECTION_TIMEOUT_MS: optionalInt(5_000).describe("Give up acquiring a connection after this long"),
-
-  DB_STATEMENT_TIMEOUT_MS: optionalInt(15_000).describe("Server-side limit per query; 0 = no limit"),
-
-  DB_LOG_QUERIES: z
-    .preprocess(emptyToUndefined, z.stringbool().default(false))
-    .describe("Log SQL queries (development only: queries may contain user data)"),
+  // Pooled URL: what the running app uses.
+  DATABASE_URL: z.preprocess(emptyToUndefined, postgresUrl),
+  // Direct URL for migrations. PgBouncer's transaction mode breaks the session
+  // features drizzle-kit needs, so this one must not be a pooled host.
+  DATABASE_URL_UNPOOLED: z.preprocess(
+    emptyToUndefined,
+    postgresUrl
+      .refine(
+        (url) => !isPoolerHost(url),
+        'Points at a pooled host ("-pooler"); use the direct URL',
+      )
+      .optional(),
+  ),
 });
 
-export type DatabaseEnv = z.infer<typeof envSchema>;
-
-function createEnv(env: NodeJS.ProcessEnv): DatabaseEnv {
+function createEnv(env: NodeJS.ProcessEnv) {
   const safeParseResult = envSchema.safeParse(env);
   if (!safeParseResult.success) {
-    throw new Error(`Invalid database environment variables:\n${z.prettifyError(safeParseResult.error)}`);
+    throw new Error(
+      `Invalid database environment variables:\n${z.prettifyError(safeParseResult.error)}`,
+    );
   }
   return safeParseResult.data;
 }
 
 export const env = createEnv(process.env);
+
+/** Locally there is no pooler, so falling back to DATABASE_URL is fine. */
+export function getMigrationDatabaseUrl() {
+  return env.DATABASE_URL_UNPOOLED ?? env.DATABASE_URL;
+}
